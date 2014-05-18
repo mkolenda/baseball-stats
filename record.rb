@@ -47,15 +47,36 @@ class Record < Hash
   end
 
   class << self
-    attr_reader :records
-    attr_reader :keys
+    attr_reader :records, :keys
 
+    # find will find records using ==
+    # pass whatever key/values you want to search by
+    # find(player_id: 'matt', year: 2000) => return records with player_id = matt AND year = 2000
+    # find(player_id: 'matt', year: 2000, "at_bats>" => 400) =>
+    #     return records with player_id = matt AND year = 2000 AND at_bats > 400
     def find(*args)
       r = []
       records.each do |record|
         match = true
         args[0].each do |k, v|
-          match = false unless record.send(k) == v
+          if k.is_a?(Symbol)
+            match = false unless record.send(k) && record.send(k) == v
+          elsif k.is_a?(String)
+            # parse out the operator from the string and compare appropriately
+            # accepts < and >.  Throws an error if a bad operator is passed
+            case k[-1..-1]
+              when "<"
+                match = false unless record.send(k.chop.to_sym) && record.send(k.chop.to_sym) < v
+              when ">"
+                match = false unless record.send(k.chop.to_sym) && record.send(k.chop.to_sym) > v
+              else
+                raise RuntimeError, "Bad argument passed to find: #{k}"
+            end
+          else
+            # bad key passed to me, don't add the record to the match list
+            match = false
+          end
+
           break unless match
         end
         r << record if match
@@ -86,19 +107,19 @@ class Record < Hash
       return unless record.is_a?(Hash) && record.has_keys?(keys)
       # Do I already have a record with these keys?
       s = {}
-      keys.each do |k|
-        s[k] = record[k]
-      end
+      keys.each { |k| s[k] = record[k] }
       r = find(s)
       if r
+        # Update the existing record with new data
         # making an assumption that there is one record found.
         # probably should be an error if more than one is returned.  Another day.
         r = r[0]
 
-        # I already have a record with these keys
-        # add the stats in record to the one I already have
         # Remove the k/v pairs that are keys so they aren't changed
         cr = record.reject {|k,v| keys.include?(k) }
+
+        # I already have a record with these keys
+        # add the stats in record to the one I already have
         cr.each_pair do |k, v|
           v = 0 if v.nil?
           if r[k]
@@ -106,32 +127,30 @@ class Record < Hash
             if r[k].is_a?(Numeric) && v.is_a?(Numeric)
               r.send("#{k.to_s}=".to_sym, r[k] + v)
             else
-              # force both to strings and append good for tracking player team/league movement
+              # force both to strings and append - good for tracking player team/league movement
               r.send("#{k.to_s}=".to_sym, "#{r[k].to_s} - #{v.to_s}")
             end
           else
-            # this is a new key so create it in me
+            # Insert, this is a new key so create it
             r.send("#{k.to_s}=".to_sym, v)
           end
         end
       else
         # this is a new record so create it
-        # remove unwanted k/v pairs before loading
-        # unwanted k/v pairs are those that are not numeric and aren't keys
         new(record)
       end
     end
   end
 end
 
-# fp = Record.new(player_id: 'fp', year: 2008,
+#  Record.new(player_id: 'fp', year: 2008,
 #                         games: 100, at_bats: 100, runs: 150, hits: 75, doubles: 10,
 #                         triples: 5, home_runs: 5, rbis: 40, stolen_bases: 30)
 #
-# b =  fp.year
+# r = Record.find("stolen_bases>" => 29)
 #
-# puts fp
-#
+# puts r[0]
+
 #
 
 # fpy = StatHash.new(player_id: 'fpy', year: 2009,

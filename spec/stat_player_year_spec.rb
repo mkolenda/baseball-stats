@@ -78,9 +78,9 @@ describe StatPlayerYear do
 
       it "ignores records that do not have the proper keys present" do
         nh = { player_id: 'chip', kwijibo: 200 }
-        before = StatPlayerYear.all_players_stats.size
+        before = StatPlayerYear.records.size
         StatPlayerYear.load(nh)
-        after = StatPlayerYear.all_players_stats.size
+        after = StatPlayerYear.records.size
         before.should eq after
       end
 

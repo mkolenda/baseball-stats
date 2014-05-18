@@ -3,7 +3,7 @@ require_relative 'baseball_stats'
 
 class StatPlayerYear < Record
   include BaseballStats
-  @all_players_stats = Set.new
+  @records = Set.new
   @keys = [:player_id, :year]
 
   def initialize(*args)

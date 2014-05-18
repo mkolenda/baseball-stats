@@ -1,9 +1,9 @@
-require_relative 'stat_hash'
+require_relative 'record'
 require_relative 'baseball_stats'
 
-class StatPlayerYearLeague < StatHash
+class StatPlayerYearLeague < Record
   include BaseballStats
-  @all_players_stats = Set.new
+  @records = Set.new
   @keys = [:player_id, :year, :league]
 
   def initialize(*args)
@@ -21,9 +21,9 @@ class StatPlayerYearLeague < StatHash
   # Instead, use a constraint of a minimum of 400 at-bats to determine those eligible for the league batting title.
   ##
   def self.batting_triple_crown(year, league)
-    ba = find_max(:batting_average, year: year, league: league, at_bats: 400)
-    hr = find_max(:home_runs, year: year, league: league, at_bats: 400)
-    rbi = find_max(:rbis, year: year, league: league, at_bats: 400)
+    ba = find_max(:batting_average, year: year, league: league, "at_bats>" => 400)
+    hr = find_max(:home_runs, year: year, league: league, "at_bats>" => 400)
+    rbi = find_max(:rbis, year: year, league: league, "at_bats>" => 400)
     ba.delete_if { |bae| hr.include?(bae) == false }.delete_if { |bae| rbi.include?(bae) == false }
   end
 end

@@ -2,22 +2,21 @@ require_relative '../record'
 
 describe Record do
 
-  let(:stat) { Record.new(john: 'oldest', paul: 'lefty', george: 'weeps', ringo: 'wilbury') }
   let(:fp) { Record.new(player_id: 'fp', year: 2008, league: 'AL',
                           games: 100, at_bats: 0, runs: 150, hits: 75, doubles: 10,
-                          triples: 5, home_runs: 5, rbis: 40, stolen_bases: 30) }
+                          triples: 5, home_runs: 5, rbis: 40, stolen_bases: 10) }
 
   let(:fpy) { Record.new(player_id: 'fpy', year: 2009, league: 'AL',
                            games: 100, at_bats: 0, runs: 150, hits: 75, doubles: 10,
-                           triples: 5, home_runs: 5, rbis: 40, stolen_bases: 30) }
+                           triples: 5, home_runs: 5, rbis: 40, stolen_bases: 15) }
 
-  let(:fp2) { Record.new(player_id: 'fp', year: 2009, league: 'AL',
+  let(:fp_again) { Record.new(player_id: 'fp', year: 2009, league: 'AL',
                            games: 100, at_bats: 0, runs: 150, hits: 75, doubles: 10,
-                           triples: 5, home_runs: 5, rbis: 40, stolen_bases: 30) }
+                           triples: 5, home_runs: 5, rbis: 40, stolen_bases: 20) }
 
   let(:fp3) { Record.new(player_id: 'fp3', year: 2008, league: 'NL',
                           games: 102, at_bats: 1, runs: 151, hits: 76, doubles: 10,
-                          triples: 5, home_runs: 5, rbis: 40, stolen_bases: 30) }
+                          triples: 5, home_runs: 5, rbis: 40, stolen_bases: 25) }
 
   let(:fp4) { Record.new(player_id: 'fp4', year: 2008, league: 'AL',
                            games: 101, at_bats: 1, runs: 151, hits: 76, doubles: 10,
@@ -25,38 +24,38 @@ describe Record do
 
   let(:fp5) { Record.new(player_id: 'fp5', year: 2008, league: 'XL',
                            games: 100, at_bats: 1, runs: 151, hits: 76, doubles: 10,
-                           triples: 5, home_runs: 5, rbis: 40, stolen_bases: 30) }
+                           triples: 5, home_runs: 5, rbis: 40, stolen_bases: 35) }
 
   let(:fp6) { Record.new(player_id: 'fp6', year: 2008, league: 'XL',
                            games: 100, at_bats: 1, runs: 151, hits: 76, doubles: 10,
-                           triples: 5, home_runs: 5, rbis: 40, stolen_bases: 30) }
+                           triples: 5, home_runs: 5, rbis: 40, stolen_bases: 40) }
 
-  subject { stat }
+  subject { fp }
 
   describe Record do
-    it { should respond_to(:john=) }
-    it { should respond_to(:paul=) }
-    it { should respond_to(:george=) }
-    it { should respond_to(:ringo=) }
+    it { should respond_to(:player_id=) }
+    it { should respond_to(:year=) }
+    it { should respond_to(:league=) }
+    it { should respond_to(:games=) }
 
-    it { should respond_to(:john) }
-    it { should respond_to(:paul) }
-    it { should respond_to(:george) }
-    it { should respond_to(:ringo) }
+    it { should respond_to(:player_id) }
+    it { should respond_to(:year) }
+    it { should respond_to(:league) }
+    it { should respond_to(:games) }
 
     it "should set the appropriate values on initialize" do
-      expect(stat.john).to eq 'oldest'
-      expect(stat.paul).to eq 'lefty'
-      expect(stat.george).to eq 'weeps'
-      expect(stat.ringo).to eq 'wilbury'
+      expect(fp.player_id).to eq 'fp'
+      expect(fp.year).to eq 2008
+      expect(fp.league).to eq 'AL'
+      expect(fp.games).to eq 100
     end
 
     it "should tell if an attribute has not been set" do
-      expect( stat.respond_to?(:kwijibo) ).to be_false
+      expect( fp.respond_to?(:kwijibo) ).to be_false
     end
 
     it "should respond to an unknown attribute with nil" do
-      expect( stat.kwijibo ).to be_nil
+      expect( fp.kwijibo ).to be_nil
     end
 
     specify "on initialize it should only accept a hash" do
@@ -77,17 +76,41 @@ describe Record do
 
         it "should find all player records when several exist for a player" do
           fp
-          fp2
+          fp_again
           f = Record.find(player_id: 'fp')
           f.include?(fp).should be_true
-          f.include?(fp2).should be_true
+          f.include?(fp_again).should be_true
+          f.size.should eq 2
         end
+
+        it "should find all player records when a boolean > is provided" do
+          fp
+          fp_again
+          fp3
+          fp4
+          fp5
+          fp6
+          f = Record.find("stolen_bases>" => 27)
+          f.include?(fp5).should be_true
+          f.include?(fp6).should be_true
+          f.size.should eq 3
+        end
+
+        it "should behave well when passing an invalid argument to find" do
+          lambda {  Record.find("stolen_bases<=" => 27)}.should raise_error
+        end
+
+        it "should not find a record when looking for an unknown key" do
+          f = Record.find(notavalidkey: 100)
+          f.should be_nil
+        end
+
       end
 
       describe "::find_max" do
         it "should find the max when one filter criteria is set" do
           fp
-          fp2
+          fp_again
           fp3
           r = Record.find_max(:games, year: 2008)
           r.size.should eq 1

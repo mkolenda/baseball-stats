@@ -1,9 +1,9 @@
 require_relative '../baseball_stats'
-require_relative '../stat_hash'
+require_relative '../record'
 
 describe BaseballStats do
-  class BS < StatHash
-    @all_players_stats = Set.new
+  class BS < Record
+    @records = Set.new
     include BaseballStats
   end
 
