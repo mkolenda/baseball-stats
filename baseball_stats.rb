@@ -17,4 +17,19 @@ module BaseballStats
     return 0 if at_bats < 200
     batting_average
   end
+
+  def batting_average_for_triple_crown
+    return 0 if at_bats < 400
+    batting_average
+  end
+
+  def home_runs_for_triple_crown
+    return 0 if at_bats < 400
+    home_runs
+  end
+
+  def rbis_for_triple_crown
+    return 0 if at_bats < 400
+    rbis
+  end
 end

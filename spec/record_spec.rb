@@ -30,6 +30,10 @@ describe Record do
                            games: 100, at_bats: 1, runs: 151, hits: 76, doubles: 10,
                            triples: 5, home_runs: 5, rbis: 40, stolen_bases: 40) }
 
+  let(:im_nil) {Record.new(player_id: 'im_nil', year: 2008, league: 'XL',
+                           games: nil, at_bats: nil, runs: nil, hits: nil, doubles: nil,
+                           triples: nil, home_runs: nil, rbis: nil, stolen_bases: nil)}
+
   subject { fp }
 
   describe Record do
@@ -43,6 +47,14 @@ describe Record do
     it { should respond_to(:league) }
     it { should respond_to(:games) }
 
+    it "should treat nil values as 0" do
+      im_nil
+      expect(im_nil.games).to eq 0
+      expect(im_nil.at_bats).to eq 0
+      expect(im_nil.hits).to eq 0
+      expect(im_nil.doubles).to eq 0
+    end
+
     it "should set the appropriate values on initialize" do
       expect(fp.player_id).to eq 'fp'
       expect(fp.year).to eq 2008
@@ -54,8 +66,8 @@ describe Record do
       expect( fp.respond_to?(:kwijibo) ).to be_false
     end
 
-    it "should respond to an unknown attribute with nil" do
-      expect( fp.kwijibo ).to be_nil
+    it "should respond to an unknown attribute with 0" do
+      expect( fp.kwijibo ).to eq 0
     end
 
     specify "on initialize it should only accept a hash" do

@@ -2,20 +2,22 @@ require_relative '../loader'
 
 describe Loader do
 
-  let(:file) { "./data/batting.csv" }
+  let(:batting_file) { "./data/batting_small.csv" }
+  let(:player_file) { "./data/player_small.csv" }
 
   describe Loader do
     it "should respond to class methods" do
-      expect{ Loader.respond_to?(:load_stat)}.to be_true
+      expect{ Loader.respond_to?(:load_stat_player_year_league_team)}.to be_true
       expect{ Loader.respond_to?(:load_stat_player_year)}.to be_true
       expect{ Loader.respond_to?(:load_stat_player_year_league)}.to be_true
+      expect{ Loader.respond_to?(:load_player)}.to be_true
     end
 
-    describe "::load_stat_player_year_team_league" do
+    describe "::load_stat_player_year_league_team" do
       it "should load the batting file into the StatPlayerYearLeagueTeam class" do
         StatPlayerYearLeagueTeam.records.size.should eq 0
-        Loader.load_stat_player_year_team_league(file)
-        StatPlayerYearLeagueTeam.records.size.should eq 24
+        Loader.load_stat_player_year_league_team(batting_file)
+        StatPlayerYearLeagueTeam.records.size.should eq 35
       end
     end
 
@@ -35,6 +37,14 @@ describe Loader do
         Loader.load_stat_player_year_league
         StatPlayerYearLeague.find(player_id: 'abreubo01', year: 2012, league: 'AL')[0].games.should eq 8
         StatPlayerYearLeague.find(player_id: 'abreubo01', year: 2012, league: 'NL')[0].games.should eq 92
+      end
+    end
+
+    describe "::load_player" do
+      it "should load the player file into the Player class" do
+        Player.records.size.should eq 0
+        Loader.load_player(player_file)
+        Player.records.size.should eq 307
       end
     end
   end

@@ -2,6 +2,15 @@ require_relative '../stat_player_year'
 
 describe StatPlayerYear do
 
+  # 199 at bats
+  let(:spoiler1) { StatPlayerYear.new(player_id: 'spoiler', year: 2008,
+                                      games: 100, at_bats: 199, runs: 150, hits: 75, doubles: 10,
+                                      triples: 5, home_runs: 5, rbis: 40, stolen_bases: 30) }
+  # lots of hits
+  let(:spoiler2) { StatPlayerYear.new(player_id: 'spoiler', year: 2009,
+                                      games: 100, at_bats: 200, runs: 150, hits: 199, doubles: 10,
+                                      triples: 5, home_runs: 5, rbis: 40, stolen_bases: 30) }
+
   let(:p1) { StatPlayerYear.new(player_id: 'hank', year: 2008,
                                 games: 100, at_bats: 200, runs: 150, hits: 75, doubles: 10,
                                 triples: 5, home_runs: 5, rbis: 40, stolen_bases: 30) }
@@ -36,8 +45,10 @@ describe StatPlayerYear do
   end
 
   describe "class methods" do
-    describe "::most_improved - most improved batting average" do
+    describe "::most_improved (batting average)" do
       it "should identify the player with the most improved batting average for a given year" do
+        spoiler1
+        spoiler2
         p1
         p2
         p3
@@ -60,7 +71,7 @@ describe StatPlayerYear do
     end
 
     describe "::load" do
-      # Testing load in StatPlayerYear becaause it has keys and StatHash does not
+      # Testing load in StatPlayerYear because it has keys and Record does not
       it "appends the data in a new record if it's keys are present" do
         nh = { player_id: 'chip', year: 2009, games: 100, at_bats: 200 }
         StatPlayerYear.load(nh)
@@ -103,7 +114,6 @@ describe StatPlayerYear do
         StatPlayerYear.load(nh)
         StatPlayerYear.find(player_id: 'chip', year: 2010)[0].kwijibo.should eq 600
       end
-
     end
   end
 end

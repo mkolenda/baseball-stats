@@ -13,10 +13,14 @@ describe StatPlayerYearLeague do
                                triples: 5, home_runs: 101, rbis: 200, stolen_bases: 30) }
 
 
+  let(:not_enough_at_bats) { StatPlayerYearLeague.new(player_id: 'neab', year: 2008, league: 'AL',
+                                           games: 100, at_bats: 299, runs: 150, hits: 199, doubles: 10,
+                                           triples: 5, home_runs: 150, rbis: 200, stolen_bases: 30) }
+
   before do
     20.times do |i|
       StatPlayerYearLeague.new(player_id: "player#{i}", year: 2008, league: 'AL', team: 'NYY',
-                               games: 100, at_bats: 401, runs: 150, hits: 100, doubles: 10,
+                               games: 100, at_bats: 390 + i, runs: 150, hits: 100, doubles: 10,
                                triples: 5, home_runs: 20, rbis: 200, stolen_bases: 30)
     end
 
@@ -29,6 +33,7 @@ describe StatPlayerYearLeague do
 
       it "should identify a triple crown winner when there is one" do
         tcw
+        not_enough_at_bats
         winner = StatPlayerYearLeague.batting_triple_crown(2008, 'AL')
         winner[0].should eq tcw
 

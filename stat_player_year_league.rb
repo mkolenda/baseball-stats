@@ -1,3 +1,7 @@
+#
+# Stores data summarized by player, year and league
+#
+
 require_relative 'record'
 require_relative 'baseball_stats'
 
@@ -21,9 +25,9 @@ class StatPlayerYearLeague < Record
   # Instead, use a constraint of a minimum of 400 at-bats to determine those eligible for the league batting title.
   ##
   def self.batting_triple_crown(year, league)
-    ba = find_max(:batting_average, year: year, league: league, "at_bats>" => 400)
-    hr = find_max(:home_runs, year: year, league: league, "at_bats>" => 400)
-    rbi = find_max(:rbis, year: year, league: league, "at_bats>" => 400)
+    ba = find_max(:batting_average_for_triple_crown, year: year, league: league)
+    hr = find_max(:home_runs_for_triple_crown, year: year, league: league)
+    rbi = find_max(:rbis_for_triple_crown, year: year, league: league)
     ba.delete_if { |bae| hr.include?(bae) == false }.delete_if { |bae| rbi.include?(bae) == false }
   end
 end
