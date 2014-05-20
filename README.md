@@ -26,121 +26,40 @@ Requirements: When the application is run, use the provided data and calculate t
 * Triple crown winner – The player that had the highest batting average AND the most home runs AND the most RBI in their league. It's unusual for someone to win this, but there was a winner in 2012. “Officially” the batting title (highest league batting average) is based on a minimum of 502 plate appearances. The provided dataset does not include plate appearances. It also does not include walks so plate appearances cannot be calculated. Instead, use a constraint of a minimum of 400 at-bats to determine those eligible for the league batting title.
 
 
-## Data:
+## Data
   All the necessary data is available in the two csv files in the data directory:
 
 1. Batting-07-12.csv – Contains all the batting statistics from 2007-2012.
-2. Column header key:
-1.1. AB – at-bats
-1.1. H – hits
-2B – doubles
-3B – triples
-HR – home runs
-RBI – runs batted in
+2. Master-small.csv – Contains the demographic data for all baseball players in history through 2012.
 
-Master-small.csv – Contains the demographic data for all baseball players in history through 2012.
+## How to Use
+ruby performance.rb -p <absolute path to Batting-07-12.csv>
+                    -s <absolute path to Master-small.csv>
+                    -i 2010
+                    -l 2007-OAK
+                    -t 2011-AL:2011-NL:2012-AL:2012-NL
 
-asd
-fa
-sdf
-asd
-fasdf
-* Fast and easy user entry of ideas to capture constructive input from a group of any size
-* Intelligent prompting to guide users toward agreement and adoption of proposals by discovering where commonalities already exist
-* Simple and elegant reporting back to the group to see where consensus stands at a glance
-* Integration with Facebook and G+ to pull credentials and push user activity
+or just 
+   ruby performance.rb -h
+   
+## Flexibility
+The Record class provides some ActiveRecord like functionality, namely the ability to call obj.attribute and 
+                    obj.attribute= through method_missing.  New record objects are created with a Hash argument.  The 
+                    initialize method adds the hash keys and values to itself and registers the new object with the
+                    Record class.  Subclasses of Record can be thought of as tables with primary keys.  Primary keys are
+                    defined in the keys class instance variable.  All of the interesting class methods are defined in the
+                    parent class Record.
 
-The master instance work-in-progress instance is hosted <a href="http://spokenvote.herokuapp.com/">on Heroku</a>.
+## Summarizing Data
+The data provided in Batting-07-12.csv is keyed by player, year, league and team.  As we all know players move from 
+team to team and league to league during the season.  MLB probably has rules surrounding how to calculate slugging percentage
+and triple crown eligibility for a player who changed teams or leagues.  For this exercise I simply aggregated the player's data for the 
+key values that relate to the wanted statistic.  For example, to calculate the league triple crown I counted performance in the NL and AL separately.
+Also, if a player switched teams calculating slugging percentage from that player on that team would not take into account the performance
+the player had on the other team.
 
-## Getting started
-
-1. Setup your development environment. We recommend (develop and test) against ruby 1.9.3-p194 or higher.
-2. Fork the <a href="https://github.com/railsforcharity/spokenvote" target="_blank">Spokenvote repo</a>.
-3. Clone your fork locally.
-4. Add the master repo as an upstream of yours (see instructions at https://help.github.com/articles/syncing-a-fork)
-
-## Making Changes
-
-Where possible please make your changes in small, cohesive commits. Send separate pull requests for each commit you feel is ready to be added to master.
-
-When doing a larger piece of work, such as the following, please use a feature/topic branch so others can more easily review it.
-
-* The commit includes the addition of, or significant version changes of, gems or libraries used
-* The commit is a significant new feature or rewrite of an existing feature
-
-The typical work flow for this is:
-
-### One time setup
- - Add railsforcharity/spokenvote as your upstream using the command
- ```
-  $ git remote add upstream https://github.com/railsforcharity/spokenvote.git
- ```
-### Before starting a new feature
- - Fetch upstream changes to your local git
-  ```
-  $ git fetch --all
-  ```
- - Merged upstream changes to your local
-  ```
-  $ git merge upstream/master
-  ```
- - Create a new feature branch on local (example: may17_my_shiny_feature)
-  ```
-  $ git checkout -b may17_my_shiny_feature
-  ```
- - Work on your feature
- - Commit your code
-
-### Before pushing to remote master
- - Sync your local master branch from upstream master
-  ```
-  $ git checkout master
-  $ git fetch upstream
-  $ git merge upstream/master
-  ```
- - Rebase your feature branch on your master
-  ```
-  $ git checkout may17_my_shiny_feature
-  $ git rebase master
-  ```
- - Push your changes to your remote
-   ```
-  $ git push origin checkout may17_my_shiny_feature
-   ```
-
-**Tests are always a welcome inclusion!**
-
-## Environment
-
-1. Edit database.example.yml and save as database.yml; this file is in .gitignore so don't worry about checking in your version. *NOTE:* Postgres is the database used in SpokenVote, you must have iit installed before taking the next step; in our experience installing through [homebrew](http://mxcl.github.com/homebrew/) is the easiest way.
-2. Run <a href="http://gembundler.com/">Bundler</a> in the project's root directory to install any needed gems.
-3. Create and update the database by running `rake db:setup`
-
-## Rails for Charity Account
-
-Participation is managed through the task system at http://RailsForCharity.org. Please create an account for yourself on that site and either pick your work from the existing tasks or add new tasks that you'd like to work on and assign to yourself.
-
+Data is summarized in the StatPlayerYear and StatPlayerYearLeague classes.
+                    
 ## License
 
-Spokenvote is a public good project distributed under the terms of either the MIT License or the GNU General
-Public License (GPL) Version 2 or later.
-
-See GPL-LICENSE and MIT-LICENSE for details.
-
-## Developers
-
-This project is an open source project of Spokenvote.org, supported in large measure by the efforts of RailsForCharity.org.
-
-## FAQ
-
-Q. Who is the intended audience for the Spokenvote web application?
-
-A: At first small groups who need to reach consensus (e.g. non-profits); eventually envisioned to work at the national political level
-
-## Contributing
-Please see the <a href="https://github.com/railsforcharity/spokenvote/downloads/">current design wireframes here</a>.
-
-Please ensure you read [the future] STYLE_GUIDELINES before making any contribution to this project.
-
-
-[logo]: https://github.com/railsforcharity/spokenvote/blob/master/app/assets/images/bluefull.png "Logo"
+MIT-LICENSE
