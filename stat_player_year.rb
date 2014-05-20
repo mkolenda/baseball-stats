@@ -1,6 +1,6 @@
 #
 # Stores data summarized by player and year
-# Will be used to compute most improved batting average 
+# Will be used to compute most improved batting average
 
 require_relative 'record'
 require_relative 'baseball_stats'

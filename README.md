@@ -33,8 +33,8 @@ Requirements: When the application is run, use the provided data and calculate t
 2. Master-small.csv – Contains the demographic data for all baseball players in history through 2012.
 
 ## How to Use
-ruby performance.rb -p <absolute path to Batting-07-12.csv>
-                    -s <absolute path to Master-small.csv>
+ruby performance.rb -p absolute_path_to_Batting-07-12.csv
+                    -s absolute_path_to_Master-small.csv
                     -i 2010
                     -l 2007-OAK
                     -t 2011-AL:2011-NL:2012-AL:2012-NL
