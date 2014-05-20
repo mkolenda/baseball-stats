@@ -8,12 +8,6 @@ require_relative 'baseball_stats'
 
 class StatPlayerYearLeagueTeam < Record
   include BaseballStats
-  @records = Set.new
+  @records = {}
   @keys = [:player_id, :year, :team, :league]
-
-  def initialize(*args)
-    raise ArgumentError, 'Need a :player_id, :year, :team, :league to create a StatPlayerYearLeague object' unless args[0].has_keys?(self.class.keys)
-    super
-  end
-
 end

@@ -26,4 +26,8 @@ describe Player do
     expect( lambda { Player.new }).to raise_error
   end
 
+  it "should find a player when asked" do
+    expect( Player.find(player_id: player.player_id)[0].full_name ).to eq "Pete Rose"
+  end
+
 end
