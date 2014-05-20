@@ -39,7 +39,6 @@ class Record < Hash
     end
   end
 
-  #
   def respond_to?(m, include_private = false)
     if m.to_s =~ /^\w+=$/
       # always responds to a setter (attribute=) method
@@ -84,12 +83,9 @@ class Record < Hash
     #     return records with player_id = matt AND year = 2000 AND at_bats > 400
     def find(*args)
       raise ArgumentError unless args[0].is_a?(Hash)
-
       r = []
-
       # If args[0] has ALL of the class keys then look based on the key values
       # If args[0] does not have ALL of the class keys then drop to the table scan approach
-
       if args[0].has_keys?(keys)
       # If the keys of args are a subset of keys then look up by the key values
         key_record = records[build_key(args[0])]
@@ -109,24 +105,7 @@ class Record < Hash
         records.each_value do |record|
           match = true
           args[0].each do |k, v|
-            # if k.is_a?(Symbol)
-              match = false unless record.send(k) && record.send(k) == v
-            # elsif k.is_a?(String)
-            #   # parse out the operator from the string and compare appropriately
-            #   # accepts < and >.  Throws an error if a bad operator is passed
-            #   case k[-1..-1]
-            #     when "<"
-            #       match = false unless record.send(k.chop.to_sym) && record.send(k.chop.to_sym) < v
-            #     when ">"
-            #       match = false unless record.send(k.chop.to_sym) && record.send(k.chop.to_sym) > v
-            #     else
-            #       raise RuntimeError, "Bad argument passed to find: #{k}"
-            #   end
-            # else
-            #   # bad key passed to me, don't add the record to the match list
-            #   match = false
-            # end
-
+            match = false unless record.send(k) && record.send(k) == v
             break unless match
           end
           r << record if match
