@@ -34,13 +34,13 @@ module Loader
     end
 
     def load_stat_player_year
-      StatPlayerYearLeagueTeam.records.each do |r|
+      StatPlayerYearLeagueTeam.records.each_value do |r|
         StatPlayerYear.load(r)
       end
     end
 
     def load_stat_player_year_league
-      StatPlayerYearLeagueTeam.records.each do |r|
+      StatPlayerYearLeagueTeam.records.each_value do |r|
         StatPlayerYearLeague.load(r)
       end
     end

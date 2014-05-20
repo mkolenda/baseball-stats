@@ -3,13 +3,13 @@ require_relative '../record'
 
 describe BaseballStats do
   class BS < Record
-    @records = Set.new
+    @records = {}
+    @keys = [:player_id]
     include BaseballStats
   end
 
-  let(:r) { BS.new( at_bats: 100, runs: 10, hits: 50, doubles: 10,
+  let(:r) { BS.new( player_id: 'player', at_bats: 100, runs: 10, hits: 50, doubles: 10,
       triples: 5, home_runs: 5, rbis: 40, stolen_bases: 30) }
-
 
   it "should calculate batting average correctly" do
     r.batting_average.should eq 0.5
@@ -71,6 +71,4 @@ describe BaseballStats do
     r.at_bats = 399
     r.rbis_for_triple_crown.should eq 0
   end
-
-
 end

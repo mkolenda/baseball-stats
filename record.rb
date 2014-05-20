@@ -1,29 +1,34 @@
 #
-# A generic way of storing data, retrieving, normalizing and summarizing data
+# A generic way of storing, retrieving, normalizing and summarizing data
 # Subclass this class when the data needs to be keyed appropriately for a given
-# purpose.  See Stat, StatPlayerYearLeague and StatPlayerYear for examples and uses
+# purpose.  See StatPlayerYearLeagueTeam, StatPlayerYearLeague and StatPlayerYear
+# for examples and uses
 #
 
 require 'set'
 require_relative 'my_hash'
 
 class Record < Hash
-  @records = Set.new # Add this (an empty Set) to each sublass
-  @keys = []         # Add a list of keys (Symbols) to each subclass
+  @records = {} # Add this (an empty hash) to each subclass
+  @keys = []    # Add a list of keys (Symbols) to each subclass
 
-  # Accepts a hash of initial values, adds them to itself and keeps track of them in records class instance variable
+  # Accepts a hash of initial values, adds them to itself and keeps track of them in the "records" class instance variable
   def initialize(*args)
-    raise ArgumentError if args.empty?
+    # Don't allow an object to be created unless key values are provided and a list of keys has been defined at the class level
+    raise ArgumentError unless args[0].has_keys?(self.class.keys) and !(self.class.keys.empty?)
     args.each do |arg|
-      raise ArgumentError, 'Creating a StatHash expects a hash as an argument' unless arg.is_a? Hash
+      raise ArgumentError, 'Creating a Record expects a hash as an argument' unless arg.is_a?(Hash)
       arg.each do |k, v|
         self.send("#{k.to_s}=".to_sym, v)
       end
     end
-    self.class.records << self
+    # create the primary key for this record then
+    # store the pk and the record in the records class instance variable
+    # Use a non-printable character as the delimiter \x01 to avoid code/data conflicts
+    self.class.records[self.class.build_key(self)] = self
   end
 
-  # Adds ActiveRecord like behavior - obj.attribute and obj.attribute=
+  # Adds ActiveRecord like behavior... obj.attribute and obj.attribute=
   def method_missing(m, *args)
     if m =~ /^\w+=$/
       self.store(m.to_s.chop.to_sym, args[0])
@@ -53,43 +58,84 @@ class Record < Hash
   end
 
   class << self
-    attr_reader :records, :keys
+    attr_reader :records
 
+    def keys
+      # Always return the keys in the same order
+      @keys.sort
+    end
+
+    # ::build_key(Hash)
+    # builds the key to be used in the records hash
+    def build_key(h)
+      keys.inject('') {|acc, key| acc = "#{acc}\x01#{h[key]}"}[1..-1]
+    end
+
+    #
+    # ::find(Hash)
     # find will find records using ==
     # pass whatever key/values you want to search by
     # find(player_id: 'matt', year: 2000) => return records with player_id = matt AND year = 2000
-    # find(player_id: 'matt', year: 2000, "at_bats>" => 400) =>
+    #
+    # Will first look for a record with matching keys (fast).  If args do not contain all key columns
+    # ::find will resort to what is basically a table scan
+    #
+    # find(player_id: 'matt', year: 2000) =>
     #     return records with player_id = matt AND year = 2000 AND at_bats > 400
     def find(*args)
-      r = []
-      records.each do |record|
-        match = true
-        args[0].each do |k, v|
-          if k.is_a?(Symbol)
-            match = false unless record.send(k) && record.send(k) == v
-          elsif k.is_a?(String)
-            # parse out the operator from the string and compare appropriately
-            # accepts < and >.  Throws an error if a bad operator is passed
-            case k[-1..-1]
-              when "<"
-                match = false unless record.send(k.chop.to_sym) && record.send(k.chop.to_sym) < v
-              when ">"
-                match = false unless record.send(k.chop.to_sym) && record.send(k.chop.to_sym) > v
-              else
-                raise RuntimeError, "Bad argument passed to find: #{k}"
-            end
-          else
-            # bad key passed to me, don't add the record to the match list
-            match = false
-          end
+      raise ArgumentError unless args[0].is_a?(Hash)
 
-          break unless match
+      r = []
+
+      # If args[0] has ALL of the class keys then look based on the key values
+      # If args[0] does not have ALL of the class keys then drop to the table scan approach
+
+      if args[0].has_keys?(keys)
+      # If the keys of args are a subset of keys then look up by the key values
+        key_record = records[build_key(args[0])]
+        if key_record
+          # Make sure the other elements of args[0] match the corresponding k/v pairs in key_record
+          match = true
+          args[0].each_pair do |k, v|
+           match = false unless key_record[k] == v
+           break unless match
+          end
+          r << key_record if match
+        else
+          # the record you are looking for isn't here, stop searching
         end
-        r << record if match
+      else
+      # look at each record in records individually - basically a table scan
+        records.each_value do |record|
+          match = true
+          args[0].each do |k, v|
+            # if k.is_a?(Symbol)
+              match = false unless record.send(k) && record.send(k) == v
+            # elsif k.is_a?(String)
+            #   # parse out the operator from the string and compare appropriately
+            #   # accepts < and >.  Throws an error if a bad operator is passed
+            #   case k[-1..-1]
+            #     when "<"
+            #       match = false unless record.send(k.chop.to_sym) && record.send(k.chop.to_sym) < v
+            #     when ">"
+            #       match = false unless record.send(k.chop.to_sym) && record.send(k.chop.to_sym) > v
+            #     else
+            #       raise RuntimeError, "Bad argument passed to find: #{k}"
+            #   end
+            # else
+            #   # bad key passed to me, don't add the record to the match list
+            #   match = false
+            # end
+
+            break unless match
+          end
+          r << record if match
+        end
+        return r unless r.empty?
+        nil
       end
-      return r unless r.empty?
-      nil
     end
+
 
     # Does what is says on the tin, finds the max attribute for a list of filters
     # The filters are of the same format as those used in find

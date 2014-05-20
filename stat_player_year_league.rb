@@ -7,13 +7,8 @@ require_relative 'baseball_stats'
 
 class StatPlayerYearLeague < Record
   include BaseballStats
-  @records = Set.new
+  @records = {}
   @keys = [:player_id, :year, :league]
-
-  def initialize(*args)
-    raise ArgumentError, 'Need a :player_id, :year and :league to create a StatPlayerTeamLeague object' unless args[0].has_keys?(self.class.keys)
-    super
-  end
 
   ##
   # Triple crown winner – The player that had the highest batting average

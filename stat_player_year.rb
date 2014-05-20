@@ -7,13 +7,8 @@ require_relative 'baseball_stats'
 
 class StatPlayerYear < Record
   include BaseballStats
-  @records = Set.new
+  @records = {}
   @keys = [:player_id, :year]
-
-  def initialize(*args)
-    raise ArgumentError, 'Need a :player_id and :year to create a StatPlayerYear object' unless args[0].has_keys?(self.class.keys)
-    super
-  end
 
   def self.most_improved(year, attribute)
     diff = prev_val = cur_val = 0
